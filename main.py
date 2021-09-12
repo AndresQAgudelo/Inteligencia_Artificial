@@ -73,31 +73,11 @@ def MenuPpal():
         print(dFrame_h.at[i, "nombre"])
 
       print("Le enviare un conjuento de examenes")        
-
-
- 
-  
-  
-
-
-    
-  
-   
-    
-  
-
- 
-
+      
 
 def main():
   MenuPpal()
   print("\t\n Hasta Luego\n\t")
-
-
- 
-
-
-   
 
 main()
   
