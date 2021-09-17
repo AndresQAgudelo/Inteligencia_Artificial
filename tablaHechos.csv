@@ -1,6 +1,6 @@
 id,nombre
-1,fiebre2,tos
-3,malestar
-4,dolor_garganta
+1,fiebre
+2,malestar
+3,dolor_garganta
+4,faringitis
 5,gripa
-6,faringitis

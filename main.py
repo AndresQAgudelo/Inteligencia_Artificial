@@ -1,3 +1,4 @@
+  
 import pandas as pd
 
 dFrame_h = pd.read_csv("tablaHechos.csv", index_col = "id")
@@ -11,8 +12,8 @@ print (dFrame_h, "\n\n", dFrame_r)
 
 
 
-def agendar(id_h):
-  dFrame_h.loc[id_h, "agenda"] = (dFrame_h.at[id_h, "agenda"]) + 1 #Modifica el valor de la celda aunmenta en 1
+def agendar(id_h, v_difuso):
+  dFrame_h.loc[id_h, "agenda"] = (dFrame_h.at[id_h, "agenda"]) + (1 - dFrame_h.at[id_h, "agenda"] ) * dFrame_r.at[v_difuso , "Difuso"]  #Modifica el valor de la celda aunmenta (x + (1- x) * Valor difuso)
 
   
 
@@ -20,9 +21,10 @@ def inferencia(nombre): #Retorna
 
   antecedente = int(dFrame_h[dFrame_h["nombre"] == nombre].index.tolist()[0])#Verifica un hecho de entrada
   consecuente = dFrame_r[dFrame_r["ID_Ante"] == antecedente].index.tolist() #Encuentra el consecuente
+ 
 
   for datos in consecuente:
-    agendar (dFrame_r.at[datos, "ID_Conse"])
+    agendar (dFrame_r.at[datos, "ID_Conse"], datos)
 
 def MenuPpal():
   dFrame_h["agenda"] = 0 #Crea una agenda 
@@ -65,30 +67,18 @@ def MenuPpal():
 
     if len(enfermedad) == 1:
       print ("Usted tiene...  \n")
-      print(dFrame_h.at[enfermedad[0], "nombre"])
+      print(dFrame_h.at[enfermedad[0], "nombre"], "en un ", dFrame_h.at[enfermedad[0], "agenda"] * 100, "%")
+   
     
     else:
       print("Usted podria tener")
       for i in enfermedad:
-        print(dFrame_h.at[i, "nombre"])
+        print(dFrame_h.at[i, "nombre"], "en un ", dFrame_h.at[enfermedad[0], "agenda"] * 100, "%")
 
       print("Le enviare un conjuento de examenes")        
-      
 
 def main():
   MenuPpal()
   print("\t\n Hasta Luego\n\t")
 
-  
 main()
-  
-
-
-
-
-
-
-
-
-
-
