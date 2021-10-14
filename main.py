@@ -1,84 +1,86 @@
-  
-import pandas as pd
+import sqlConnection as sql
+import menu as m
+import enseñar
 
-dFrame_h = pd.read_csv("tablaHechos.csv", index_col = "id")
-dFrame_r = pd.read_csv("tablaReglas.csv", index_col = "ID_R")
-
-print (dFrame_h, "\n\n", dFrame_r)
-
-
-
-
-
-
-
-def agendar(id_h, v_difuso):
-  dFrame_h.loc[id_h, "agenda"] = (dFrame_h.at[id_h, "agenda"]) + (1 - dFrame_h.at[id_h, "agenda"] ) * dFrame_r.at[v_difuso , "Difuso"]  #Modifica el valor de la celda aunmenta (x + (1- x) * Valor difuso)
-
-  
-
-def inferencia(nombre): #Retorna
-
-  antecedente = int(dFrame_h[dFrame_h["nombre"] == nombre].index.tolist()[0])#Verifica un hecho de entrada
-  consecuente = dFrame_r[dFrame_r["ID_Ante"] == antecedente].index.tolist() #Encuentra el consecuente
- 
-
-  for datos in consecuente:
-    agendar (dFrame_r.at[datos, "ID_Conse"], datos)
-
-def MenuPpal():
-  dFrame_h["agenda"] = 0 #Crea una agenda 
-  bd_sintomas = []
-  salir = 0
-  maxs = 0
-  
-
-
-
-  print ("\n \tBIENVENIDO\t", "Soy el Dr D \n")
-  
-
-  while (salir == 0):
-    sintoma = str(input ("¿Que sistoma tiene? \n")) #Se pide una entrada  
-    if (len(dFrame_h[dFrame_h["nombre"]==sintoma])) > 0: #Verfica que la entrada sea un hecho existente
-      for i in bd_sintomas:
-        if sintoma == i:
-          salir = 1
-          break
-
-      bd_sintomas.append(sintoma) 
-      inferencia(sintoma)
-      maxs= dFrame_h["agenda"].max()
-        
-    elif(sintoma == ""):
-      salir = 1
-      break
-    
-    else:
-      print("\t \nSintoma no valido\n")
-    
-
-  if (maxs == 0 ):
-    print ("\t \n Le enviare un conjuento de examenes")
-
-  else:
-    enfermedad = dFrame_h[dFrame_h["agenda"] == maxs].index.tolist()
-   
-
-    if len(enfermedad) == 1:
-      print ("Usted tiene...  \n")
-      print(dFrame_h.at[enfermedad[0], "nombre"], "en un ", dFrame_h.at[enfermedad[0], "agenda"] * 100, "%")
-   
-    
-    else:
-      print("Usted podria tener")
-      for i in enfermedad:
-        print(dFrame_h.at[i, "nombre"], "en un ", dFrame_h.at[enfermedad[0], "agenda"] * 100, "%")
-
-      print("Le enviare un conjuento de examenes")        
 
 def main():
-  MenuPpal()
-  print("\t\n Hasta Luego\n\t")
+  #Variables numnodo = primer nodo
+  continuar = True
+  numnodo = 1
+  while(continuar == True):  
+    menu = sql.sql_connection() #Coneccion a la BD si no existe la crea
+    
+    if menu == 0: #Si la BD no tienen nada
+        Nuevonodo = enseñar.menuEnseñar() # Toma los valores ingresados por el usuario
 
-main()
+        #Asigna los nuevos valores (Objeto, Atributo)
+        sql.sql_AddFirstData(2, Nuevonodo[0], False)
+        sql.sql_AddFirstData(1, Nuevonodo[1], True)
+
+        sql.sql_ViewData()
+        
+      
+    else:
+    
+      #Busca en la base de datos el nodo
+      Elemento = sql.sql_ViewOneData(numnodo)
+
+      #Agrega Objeto, Atributo hijo a la izquierda
+      if Elemento == (0,0,0):
+        Nuevonodo = enseñar.menuEnseñar()
+        print(Nuevonodo)
+        sql.sql_AddFirstData(numnodo * 2, Nuevonodo[0], False)
+        sql.sql_AddFirstData(numnodo, Nuevonodo[1], True)
+        numnodo =1
+        continue
+
+
+      if  Elemento[2] == 0: #SI ES OBJETO, LLEGO AL FINAL DE LA RAMA
+        entonces = m.menuPpal(numnodo, Elemento[1])
+         
+          #Respuesta negativa, Enseñar
+        if entonces[1] == 0:
+            
+          Nuevonodo = enseñar.menuEnseñar()
+          print(Nuevonodo)
+
+          sql.sql_AddNewData(numnodo, Nuevonodo, False)
+          sql.sql_ViewData()
+          numnodo = 1
+          
+        #Respuesta afirmativa Gano, Jugar de nuevo?
+        else:
+          continuar = m.MenuGanar()
+          numnodo = 1
+
+          # Jugar de nuevo = si, Continuar
+          # Jugar de nuevo = no, Salir
+
+        
+      else: # SI ES UN ATRIBUTO
+        
+        #Busca en la base de datos el nodo
+        Elemento = sql.sql_ViewOneData(numnodo)
+
+        #Muestra el nombre del Atribbto/Objeto en pantalla
+        entonces = m.menuPpal(numnodo, Elemento[1])
+
+        #Se mueve al nuevo nodo, Respuesta Si = nodo* 2, No = nodo * 2 + 1
+        numnodo = entonces[0]
+  
+
+
+if __name__ == "__main__":
+    main()
+    
+    
+
+        
+      
+
+      
+    
+  
+
+
+
