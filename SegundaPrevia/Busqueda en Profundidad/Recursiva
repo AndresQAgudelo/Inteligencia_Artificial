@@ -1,0 +1,35 @@
+graph = {"A":["B","C", "D"],
+           "B":["E"],
+           "C":["F","G"],
+           "D":["H"],
+           "E":["I"],
+           "F":["J"]}
+
+def recursive_dfs(graph, source,path = []):
+
+       if source not in path:
+
+           path.append(source)
+
+           if source not in graph:
+               # leaf node, backtrack
+               return path
+
+           for neighbour in graph[source]:
+
+               path = recursive_dfs(graph, neighbour, path)
+
+
+       return path
+
+path = recursive_dfs(graph, "A")
+
+dato_Buscar = input("Ingresar Dato a Buscar = > ")
+
+for i in path:
+  print(i)
+  if dato_Buscar == i:
+    print("Encontrado")
+    break
+
+print(" ".join(path))
