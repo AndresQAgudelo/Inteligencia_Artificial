@@ -1,0 +1,25 @@
+ def breadth_first_search(origin_id, destination_id, map):
+    
+    Ruta_Path = [Path([origin_id])]
+    nt = 0
+    encontrado = 0
+    while(encontrado == 0 and nt == 0):
+        Cabeza = Ruta_Path[0]        
+        Expand = expand(Cabeza,map)   
+        if (Expand[0] != Cabeza):
+            El = remove_cycles(Expand) 
+            El = remove_cycles(El)
+            Ruta_Path = insert_breadth_first_search(Ruta_Path[1:], El)
+            
+            if(destination_id == Ruta_Path[0].route[-1]):
+                encontrado = 1                
+        else:
+            Ruta_Path[0:1] = []
+        
+        if Ruta_Path ==[]:
+            nt =1
+        
+    if encontrado == 1:
+        return Ruta_Path[0]
+    else:
+        return 'No existe solución'
